@@ -11,60 +11,17 @@ import moment from 'moment'
 const options = [
     { value: 'rnl', label: 'RNL' },
     { value: 'civil', label: 'Civil' },
-    { value: 'central', label: 'Central' }
+    { value: 'central', label: 'Central' },
+    { value: 'torrenorte', label: 'Torre Norte' },
+    { value: 'torresul', label: 'Torre Sul' }
 ]
-
-
-
-const table1 = {
-    hasPc: true,
-    state: 0
-}
-const table2 = {
-    hasPc: true,
-    state: 3
-}
-const table3 = {
-    hasPc: false,
-    state: 2
-}
-const table4 = {
-    hasPc: true,
-    state: 1
-}
-const table5 = {
-    hasPc: true,
-    state: 1
-}
-
-const arraySalas = {
-                    tables: [table1],
-                    name: 1
-                }
-
-const arraySalas2 = {
-                    tables:[table1,table1,table1,table1],
-                    name:2
-                }
-
-
-const arrayBuilding = { 
-                    rooms : [arraySalas],
-                    name : "rnl"}
-const arrayBuilding2 = { 
-                    rooms : [arraySalas,arraySalas],
-                    name: "civil"}
-const arrayBuilding3 = {
-                    rooms: [arraySalas2,arraySalas2,arraySalas,arraySalas2,arraySalas],
-                    name: "central"}
-
 
 
 const Dashboard = () => {
     //const [dt, setDt] = useState(new Date().toLocaleString());
-    const [currentBuilding, updateCurrentBuilding] = useState(arrayBuilding); // objeto edificio
+    const [currentBuilding, updateCurrentBuilding] = useState(null); // objeto edificio
     const [currentRoomSelected, updateCurrentRoomSelected] = useState(1); // nome da sala 
-    const [currentTables, updateCurrentTables] = useState(arrayBuilding.rooms[0].tables); // objeto edificio
+    const [currentTables, updateCurrentTables] = useState(); // objeto edificio
     const [buttonLivresSelected, updateButtonLivresSelected] = useState(false); 
     const [buttonComputadorSelected, updateButtonComputadorSelected] = useState(false);
     const [currentTableSelected, updateCurrentTableSelected] = useState(null); 
@@ -73,7 +30,7 @@ const Dashboard = () => {
     useEffect(() => {
         let arrayAll = []
         firestore
-        .collection('tecnico2')
+        .collection('tecnico4')
             .get().then(snapshot => {
                     snapshot.forEach(doc => {
                     let aux = doc.data()
@@ -82,10 +39,16 @@ const Dashboard = () => {
                   })
                   console.log(arrayAll)
                   updateAllBuildings(arrayAll)
-                  updateCurrentBuilding(arrayAll[0])
-                  updateCurrentRoomSelected(arrayAll[0].rooms[0].name)
-                  updateCurrentTables(arrayAll[0].rooms[0].tables)
-                  window.setInterval(() => verificaEntradas(arrayAll), 10000);
+                  for(const building of arrayAll){
+                      if(building.name === "rnl"){
+                        updateCurrentBuilding(building)
+                        updateCurrentRoomSelected(building.rooms[0].name)
+                        updateCurrentTables(building.rooms[0].tables)
+                        break
+                      }
+                      
+                  }
+                  /* window.setInterval(() => verificaEntradas(arrayAll), 10000); */
                 })
     }, [])
 
@@ -96,7 +59,8 @@ const Dashboard = () => {
             duration:null,
             initTime:null,
             endTime:null,
-            istID:null
+            istID:null,
+            checked:false
         }
         for(const elem of arrayAll){
             for(const room of elem.rooms){
@@ -116,7 +80,7 @@ const Dashboard = () => {
                                             let getTables = room.tables
                                             let indexTable = room.tables.findIndex(e =>  {return e.name === t.name})
                                             getTables[indexTable].reservation = reservation
-                                            getTables[indexTable].state = 1
+                                            getTables[indexTable].dirty = true
                                             console.log(getTables)
                                             getRooms[indexRoom] = {
                                                 tables:getTables,
@@ -124,7 +88,7 @@ const Dashboard = () => {
                                             }
                                             console.log(getRooms)
                                             console.log(room.name)
-                                            firestore.collection('tecnico2').doc(elem.id).update({
+                                            firestore.collection('tecnico4').doc(elem.id).update({
                                                 rooms: getRooms,
                                                 name: elem.name
                                             }).then()
@@ -158,13 +122,14 @@ const Dashboard = () => {
     }
 
     const mapRoomsToBuilding = () => {
-        return currentBuilding.rooms.map((sala, key) => {
+        if(currentBuilding){
+            return currentBuilding.rooms.map((sala, key) => {
             let livre = 0, livreN = 0, ocupadaA = 0, ocupada = 0
             sala.tables.forEach(mesa => {
-                if(mesa.state === 0) livre++
-                else if(mesa.state === 1) livreN++
-                else if(mesa.state === 2) ocupadaA++
-                else if(mesa.state === 3) ocupada++
+                if(mesa.reservation.endTime === null && mesa.dirty===false) livre++
+                else if(mesa.reservation.endTime === null && mesa.dirty===true) livreN++
+                else if(mesa.reservation.endTime !== null && mesa.reservation.checked===false) ocupadaA++
+                else if(mesa.reservation.endTime !== null && mesa.reservation.checked===true) ocupada++
             })
             return(
                 <li className={currentRoomSelected === sala.name ? "barraActive" : "barra"} onClick={() => {
@@ -181,19 +146,24 @@ const Dashboard = () => {
                 </li>
             )
         })
+        }
+        
     }
 
     const getBarras = () => {
         let livre = 0, livreN = 0, ocupadaA = 0, ocupada = 0
-        if(typeof currentBuilding.rooms[0] !== "undefined"){
+        if(currentBuilding){
             for(const room of currentBuilding.rooms){
                 if(currentRoomSelected === room.name){
                     for(const mesa of room.tables){
-                        if(mesa.state === 0) livre++
-                        else if(mesa.state === 1) livreN++
-                        else if(mesa.state === 2) ocupadaA++
-                        else if(mesa.state === 3) ocupada++
-                        
+                        if(mesa.reservation.endTime === null && mesa.dirty===false) livre++
+                        else if(mesa.reservation.endTime === null && mesa.dirty===true) livreN++
+                        else if(mesa.reservation.endTime !== null && mesa.reservation.checked===false) ocupadaA++
+                        else if(mesa.reservation.endTime !== null && mesa.reservation.checked===true) ocupada++
+                        else{
+                            console.log(mesa.reservation.endTime)
+                            console.log(mesa.reservation.checked)
+                        }
                     }  
                     return (
                         <div className="barra-salas-flex2" style={{marginTop:"20px"}}>
@@ -220,7 +190,7 @@ const Dashboard = () => {
         console.log(currentRoomSelected)// nome da sala
         console.log(currentTableSelected)// objeto mesa
         firestore
-        .collection('tecnico2')
+        .collection('tecnico4')
             .get().then(snapshot => {
                     snapshot.forEach(doc => {
                     let aux = doc.data()

@@ -12,8 +12,6 @@ import { firestore } from '../fire';
 const Table = (props) => {
 
     const [time, updateTime] = useState(1800)
-    const [state, updateState] = useState(null)
-    const dateToFormat = '1976-04-19T12:59-0500';
     const date = new Date()
     let duration =  props.table?moment(props.table.reservation.endTime).diff(moment(),"minutes"):null
     let fim = props.table?moment(props.table.reservation.endTime).hour() + ':' + (moment(props.table.reservation.endTime).minute().toString().length<2?"0"+moment(props.table.reservation.endTime).minute():moment(props.table.reservation.endTime).minute()):null
@@ -63,11 +61,12 @@ const Table = (props) => {
             duration:null,
             endTime:finalTime.toString(),
             initTime:current,
-            istID:istID
+            istID:istID,
+            checked:false
         }
         for(const elem of props.buildings){
             if(elem.name===props.currentBuilding.name){
-                firestore.collection("tecnico2")
+                firestore.collection("tecnico4")
                 .doc(elem.id).get().then(res => {
                     let getRooms = res.data().rooms
                     for(const r of getRooms){
@@ -79,7 +78,7 @@ const Table = (props) => {
                                     let indexTable = r.tables.findIndex(e =>  {return e.name === t.name})
                                     if(tipo==="new"){
                                         getTables[indexTable].reservation = reservation
-                                        getTables[indexTable].state = 3
+                                        getTables[indexTable].dirty = true
                                         console.log(getTables)
                                         getRooms[indexRoom] = {
                                             tables:getTables,
@@ -87,13 +86,13 @@ const Table = (props) => {
                                         }
                                     }
                                     else if(tipo==="clean"){
-                                        getTables[indexTable].state = 0
+                                        getTables[indexTable].dirty = false
                                         getRooms[indexRoom] = {
                                             tables:getTables,
                                             name:parseInt(r.name) 
                                         }
                                     }
-                                    firestore.collection('tecnico2').doc(elem.id).update({
+                                    firestore.collection('tecnico4').doc(elem.id).update({
                                         rooms: getRooms,
                                         name: elem.name
                                     }).then(() => props.callbackReserva(t))
@@ -112,7 +111,7 @@ const Table = (props) => {
         <div className="table" hidden={props.table?false:true}>
             <p className="table-bye" onClick={() => props.callback()}>X</p>
             {/* MESA LIMPA */}
-            <div className="new" hidden={props.table?props.table.state === 0?false:true:true}>
+            <div className="new" hidden={props.table?(props.table.reservation.endTime===null && props.table.dirty===false)?false:true:true}>
                 <div className="new-top" >
                     <div className="new-left">
                         <div className="new-id">
@@ -159,8 +158,8 @@ const Table = (props) => {
                     
                 </div>  
             </div>
-            {/* MESA NAO LIMPA */}
-            <div hidden={props.table?props.table.state === 1?false:true:true}>
+            {/* MESA NAO LIMPA SEM RESERVA*/}
+            <div hidden={props.table?(props.table.dirty && props.table.reservation.endTime===null)?false:true:true}>
                 <div className="new-top" >
                     <div className="new-right">
                         <div className="new-right-top">
@@ -177,7 +176,7 @@ const Table = (props) => {
             
             </div>
             {/* MESA OCUPADA SEM CHECK-IN */}
-            <div hidden={props.table?props.table.state === 2?false:true:true}>
+            <div hidden={props.table?props.table.reservation.endTime !== null && props.table.reservation.checked === false?false:true:true}>
             <div className="new-top" >
                     <div className="new-left">
                         <div style={{display:"flex"}}>
@@ -185,8 +184,8 @@ const Table = (props) => {
                             <div className="cancelar-left-user">
                                 <p className="new-id-text-cancelar">Manuel Vasco</p>
                                 <p className="new-id-text-cancelar">87356</p>
-                                <p className="new-id-text-cancelar-duration"><p style={{color:"#ccc", marginRight:"5PX"}}>Tempo restante:</p>{props.table?duration:null}</p>
-                                <p className="new-id-text-cancelar-end"><p style={{color:"#ccc", marginRight:"5PX"}}>Fim:</p> 14h33m</p>
+                                <p className="new-id-text-cancelar-duration"><p style={{color:"#ccc", marginRight:"5PX"}}>Tempo restante:</p>{duration?duration:null} min </p>
+                                <p className="new-id-text-cancelar-end"><p style={{color:"#ccc", marginRight:"5PX"}}>Fim:</p>{fim}</p>
                             </div>
                         </div>
                     </div>  
@@ -210,7 +209,7 @@ const Table = (props) => {
                 </div>  
                 </div>
             {/* MESA OCUPADA*/}
-            <div hidden={props.table?props.table.state === 3?false:true:true}>
+            <div hidden={props.table?props.table.reservation.endTime !== null && props.table.reservation.checked === true?false:true:true}>
             <div className="new-top" >
                     <div className="new-left">
                         <div style={{display:"flex"}}>

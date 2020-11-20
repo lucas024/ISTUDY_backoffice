@@ -25,10 +25,10 @@ const DisplayBox = (props) => {
                         <p className="display-box-right-user-name">{item.reservation?item.reservation.istID:null}</p>
                     </div>
                 </div>
-                <div style={{backgroundColor:item.state===0?"#00E070":
-                            item.state===1?"#FFDC5F":
-                            item.state===2?"#FF8A00":
-                            "#DA1919"}} className="display-box-bottom-color">
+                <div style={{backgroundColor:item.reservation?(item.reservation.endTime===null && item.dirty===false)?"#00E070":
+                            (item.reservation.endTime===null && item.dirty===true)?"#FFDC5F":
+                            (item.reservation.endTime!==null && item.reservation.checked===false)?"#FF8A00":
+                            "#DA1919":"white"}} className="display-box-bottom-color">
 
                 </div>      
 
