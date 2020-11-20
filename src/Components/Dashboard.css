@@ -1,0 +1,261 @@
+.dashboard{
+    display: flex;
+}
+
+.dashboard-left{
+    flex: 1 1 0;
+    min-width: 300px;
+}
+
+
+
+.dashboard-left-select{
+    margin: auto;
+    margin-top: 50px;
+    width: 250px;
+    text-align: left;
+    border-color: transparent;
+    color: #00A0E4;
+}
+
+.dashboard-left-rooms{
+    height: 300px;
+    width: 250px;
+    margin: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    overflow-y: scroll;
+}
+
+
+.dashboard-left-rooms::-webkit-scrollbar
+{
+    width: 6px;
+}
+
+.dashboard-left-rooms::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px #ccc;
+    background-color: #555;
+}
+
+.dashboard-left-legenda{
+    width: 250px;
+    margin: auto;
+    margin-top: 60px;
+}
+
+.dashboard-left-legenda-text{
+    font-weight: 300;
+    font-size: 14px;
+    text-align: left;
+}
+
+.dashboard-left-legenda-flex{
+    display: flex;
+    margin-left: 20px;
+    margin-bottom: -5px;
+}
+
+.dashboard-left-legenda-flex-bola{
+    height: 20px;
+    width: 25px;
+    border-radius: 2px;
+    margin-top: 12px;
+}
+
+.dashboard-left-legenda-flex-text{
+    margin-left: 10px;
+    font-weight: 400;
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+
+
+.dashboard-left-top{
+    min-height: calc(100vh - 310px);
+}
+
+
+
+.dashboard-left-bot{
+    height: 250px;
+    border-top: 2px solid #EEF2F5;
+    width: 250px;
+    margin: auto;
+    position: relative;
+}
+  
+.dashboard-left-img{
+    width: 50px;
+    margin-top: 30px;
+    position: absolute;
+    left: 0;
+}
+
+.dashboard-left-name{
+    margin-top: 30px;
+    width: 200px;
+    text-align: left;
+    margin-left: 60px;
+}
+
+.dashboard-left-name-text{
+    margin: 0;
+}
+
+.dashboard-left-name-seg{
+    color: rgb(168, 168, 168);
+    font-weight: 300;
+    margin-top: 10px;
+}
+.dashboard-left-sair{
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #00A0E4;
+    color: #00A0E4;
+    font-weight: 400;
+    width: 200px;
+    margin: auto;
+    font-size: 20px;
+    position: absolute;
+    bottom: 20px;
+    cursor: pointer;
+}
+
+
+.barra{
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+.barra:hover{
+    background-color: #EEF2F5;
+}
+
+.barra-nome{
+    color: #00A0E4;
+    margin: 0;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 18px;
+}
+
+.barra-salas-flex{
+    display: flex;
+    justify-content: space-evenly;
+    width: 150px;
+}
+
+
+.barra-salas{
+    margin-top: 10px;
+    padding: 1px 10px;
+    border-radius: 2px;
+}
+
+.list-barras{
+    margin: 0;
+    padding: 0;
+}
+
+.barraActive{
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #EEF2F5;
+    border-left: 4px solid #00A0E4;
+}
+
+.dashboard-right{
+    height: calc(100vh) ;
+    flex: 6 1 0;
+    background-color: white;
+}
+
+.dashboard-right-content{
+    background-color: #EEF2F5;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-top: 50px;
+    height: calc(100vh - 50px);
+    width: calc(100% - 20px);
+    min-width: 1185px;
+}
+
+.dashboard-right-top{
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 50px;
+}
+
+.dashboard-right-top-left{
+    text-align: left;
+}
+.dashboard-right-top-left-room{
+    margin: 0;
+    margin-top: 30px;
+    color: #717782;
+    font-size: 45px;
+    font-weight: 300;
+}
+.dashboard-right-top-left-floor{
+    margin: 0;
+    margin-top:10px;
+    color: #717782;
+    font-size: 35px;
+    font-weight: 300;
+}
+
+
+.barra-salas-flex2{
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+
+}
+
+.barra-salas2{
+    margin-top: 10px;
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.dashboard-right-top-left-buttons{
+    display: flex;
+    margin-top: 10px;
+    width: 200px;
+    justify-content: space-between;
+}
+
+
+.dashboard-right-top-left-button{
+    margin: 0;
+    margin-top: 5px;
+    color: #009DE0;
+    border: 1px solid #009DE0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    cursor: pointer;
+}
+
+.dashboard-right-top-left-button-active{
+    margin: 0;
+    margin-top: 5px;
+    color: #009DE0;
+    border: 1px solid #009DE0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    cursor: pointer;
+    background-color: #a0e2ff;
+}
+
+.dashboard-help{
+    flex: 1 1 0;
+}

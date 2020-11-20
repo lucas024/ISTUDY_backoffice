@@ -1,0 +1,76 @@
+.login{
+    overflow: hidden;
+    position: relative;
+}
+.login-box{
+    margin: 200px auto;
+    width: 500px;
+    height: 500px;
+    background-color: white;
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    border-radius: 10px;
+    padding-bottom: 50px;
+}
+.login-box-input{
+    width: 300px;
+    margin:auto;
+}
+
+.login-box-input-user{
+    margin: 0;
+    width: 300px;
+}
+
+.login-box-input-user-input{
+    width: 300px;
+    height: 30px;
+    border: 2px solid #009DE0;
+    border-radius: 5px;
+    font-size: 16px;
+}:focus{
+    outline: none;
+    border:  2px solid #227ea5 ;
+}
+
+.login-box-input-grey{
+    text-align: left;
+    font-weight: 300;
+    color: rgb(95, 95, 95);
+    margin: 20px 0 5px 0;
+}
+
+.login-box-button{
+    padding: 25px;
+    background-color: #009DE0;
+    width: 80px;
+    margin: auto;
+    margin-top: 50px;
+    color: white;
+    cursor: pointer;
+}
+
+.login-box-button:hover{
+    -webkit-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+    
+}
+
+.login-box-tecnico{
+    margin-top: 50px;
+    width: 200px;
+}
+
+.login-footer{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #2E3A42;
+}
+
+.login-box-logo{
+    margin: 50px 0 60px 0;
+}
