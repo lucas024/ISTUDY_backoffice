@@ -58,7 +58,6 @@ const Table = (props) => {
         duration = finalTime.diff(moment(),"minutes")
         updateIstID(istID)
         const reservation = {
-            duration:null,
             endTime:finalTime.toString(),
             initTime:current,
             istID:istID,
