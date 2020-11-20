@@ -43,6 +43,12 @@ const Table = (props) => {
         }        
     }
 
+    // Checks if istID meets the requirements
+    function checkIstID() {
+        console.log(/^(ist[0-9]{6})$/.test(istID))
+        return /^(ist[0-9]{6})$/.test(istID) 
+    }
+
     const reservationHandler = (tipo) => {
         /* props.currentBuilding // objeto edificio
         props.room // nome da sala
@@ -57,6 +63,14 @@ const Table = (props) => {
         fim = f
         duration = finalTime.diff(moment(),"minutes")
         updateIstID(istID)
+
+        if(!checkIstID()){
+            console.log('The istID inserted does not meet the requirements');
+            console.log('Nothing to do...');
+            return
+        }
+        
+        
         const reservation = {
             endTime:finalTime.toString(),
             initTime:current,
@@ -115,7 +129,7 @@ const Table = (props) => {
                     <div className="new-left">
                         <div className="new-id">
                             <p className="new-id-text">IST ID</p>
-                            <input className="new-id-input" onChange={(e) => updateIstID(e.target.value)}></input>
+                            <input className={istID ? checkIstID() ? "new-id-input" : "new-id-input-2" : "new-id-input"} onChange={(e) => updateIstID(e.target.value)}></input>
                         </div>
                         <div className="new-add-time">
                             <p className="new-add-duration">Duração:</p>

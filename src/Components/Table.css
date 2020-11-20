@@ -55,6 +55,15 @@
     padding: 2px 2px;
 }
 
+.new-id-input-2{
+    margin-left: 20px;
+    width: 100px;
+    border: 1px solid #ff0000;
+    border-radius: 3px;
+    font-size: 16px;
+    padding: 2px 2px;
+}
+
 .new-add-time{
     position: absolute;
     top: 60px;
