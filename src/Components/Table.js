@@ -4,7 +4,7 @@ import Computer from '../Assets/computer.png'
 import Avatar from '../Assets/avatar.png'
 import Moment from 'react-moment';
 import  moment  from "moment";
-import { firestore } from '../fire';
+import app, { firestore } from '../fire';
 
 
 
@@ -13,11 +13,9 @@ const Table = (props) => {
 
     const [time, updateTime] = useState(1800)
     const date = new Date()
-    let duration =  props.table?moment(props.table.reservation.endTime).diff(moment(),"minutes"):null
-    let fim = props.table?moment(props.table.reservation.endTime).hour() + ':' + (moment(props.table.reservation.endTime).minute().toString().length<2?"0"+moment(props.table.reservation.endTime).minute():moment(props.table.reservation.endTime).minute()):null
+    let duration = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()).diff(moment(),"minutes"):null:null
+    let fim = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()).hour() + ':' + (moment(props.table.reservation.endTime.toDate()).minute().toString().length<2?"0"+moment(props.table.reservation.endTime.toDate()).minute():moment(props.table.reservation.endTime.toDate()).minute()):null:null
     const [istID, updateIstID] = useState("")
-
- 
 
     const getMinutes = () => {
         let totalSeconds = time
@@ -27,6 +25,7 @@ const Table = (props) => {
         if(minutes<10) return(hours.toString() + "h:" + minutes.toString() +"0m")
         return(hours.toString() + "h:" + minutes.toString() +"m")
     }
+
     const timeChangeHandler = (val) => {
         let current = time
         if(current === 10800 && val===0) {
@@ -45,38 +44,36 @@ const Table = (props) => {
 
     // Checks if istID meets the requirements
     function checkIstID() {
-        console.log(/^(ist[0-9]{6})$/.test(istID))
-        return /^(ist[0-9]{6})$/.test(istID) 
+        console.log(/^([0-9]{6})$/.test(istID))
+        return /^([0-9]{6})$/.test(istID) 
     }
 
     const reservationHandler = (tipo) => {
-        /* props.currentBuilding // objeto edificio
-        props.room // nome da sala
-        props.table// objeto mesa */
-        //props.buildings
         let currentTime = moment()
         let finalTime = moment().add(time, 'seconds')
         let finalTimeMinutes = finalTime.minute()
         if(finalTimeMinutes.length===1) finalTimeMinutes = '0' + finalTimeMinutes
         let f = finalTime.hour() + ':' + finalTimeMinutes
-        let current = currentTime.toString()
         fim = f
         duration = finalTime.diff(moment(),"minutes")
         updateIstID(istID)
 
-        if(!checkIstID()){
-            console.log('The istID inserted does not meet the requirements');
-            console.log('Nothing to do...');
-            return
-        }
-        
-        
+        if(tipo === 'new')
+            if(!checkIstID()){
+                console.log('The istID inserted does not meet the requirements');
+                console.log('Nothing to do...');
+                return
+            }
+        const end = finalTime.toDate()
+        const init = currentTime.toDate()
+
         const reservation = {
-            endTime:finalTime.toString(),
-            initTime:current,
-            istID:istID,
-            checked:false
+            endTime: end,
+            initTime: init,
+            istID: tipo === 'checkin' ? props.table.reservation.istID : istID,
+            checked: tipo === 'checkin' ? true : false,
         }
+
         for(const elem of props.buildings){
             if(elem.name===props.currentBuilding.name){
                 firestore.collection("tecnico4")
@@ -89,10 +86,9 @@ const Table = (props) => {
                                 if(t.name === props.table.name){
                                     let getTables = r.tables
                                     let indexTable = r.tables.findIndex(e =>  {return e.name === t.name})
-                                    if(tipo==="new"){
+                                    if(tipo === "new" || tipo === 'checkin'){
                                         getTables[indexTable].reservation = reservation
                                         getTables[indexTable].dirty = true
-                                        console.log(getTables)
                                         getRooms[indexRoom] = {
                                             tables:getTables,
                                             name:parseInt(r.name) 
@@ -105,13 +101,31 @@ const Table = (props) => {
                                             name:parseInt(r.name) 
                                         }
                                     }
+                                    else if(tipo === "cancelar" || tipo === 'checkout'){
+                                        const cancelReservation = {
+                                            endTime: null,
+                                            initTime: null,
+                                            istID: null,
+                                            checked:false,
+                                        }
+
+                                        getTables[indexTable].reservation = cancelReservation
+
+                                        if(tipo === 'checkout'){
+                                            getTables[indexTable].dirty = true
+                                        }
+                                        
+                                        getRooms[indexRoom] = {
+                                            tables:getTables,
+                                            name:parseInt(r.name) 
+                                        }
+                                    }
+                                   
                                     firestore.collection('tecnico4').doc(elem.id).update({
                                         rooms: getRooms,
                                         name: elem.name
                                     }).then(() => props.callbackReserva(t))
                                 }
-                                    
-
                             }
                         }
                     }  
@@ -119,6 +133,15 @@ const Table = (props) => {
             }
         }
     }
+
+    function extendReservation(minutes){
+        console.log('I want to extend my reservation');
+        console.log(duration);
+        console.log(moment().hour() + ':' + moment().minute() + ':' + moment().second());
+        var finalTime = moment().add(minutes, 'minutes').format('HH:mm');
+        console.log(finalTime);
+    }
+    
 
     return (
         <div className="table" hidden={props.table?false:true}>
@@ -195,8 +218,7 @@ const Table = (props) => {
                         <div style={{display:"flex"}}>
                             <img src={Avatar} alt="perfil" className="cancelar-left-img"></img>
                             <div className="cancelar-left-user">
-                                <p className="new-id-text-cancelar">Manuel Vasco</p>
-                                <p className="new-id-text-cancelar">87356</p>
+                                <p className="new-id-text-cancelar">{props.table ? props.table.reservation.istID : null}</p>
                                 <p className="new-id-text-cancelar-duration"><p style={{color:"#ccc", marginRight:"5PX"}}>Tempo restante:</p>{duration?duration:null} min </p>
                                 <p className="new-id-text-cancelar-end"><p style={{color:"#ccc", marginRight:"5PX"}}>Fim:</p>{fim}</p>
                             </div>
@@ -212,11 +234,11 @@ const Table = (props) => {
                 </div>
                 <div className="new-bot">
                     <div className="new-bot-div">
-                        <p className="new-bot-button">Cancelar</p>
+                        <p className="new-bot-button" onClick={() => reservationHandler("cancelar")}>Cancelar</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
-                        <p className="new-bot-button">Check-in</p>
+                        <p className="new-bot-button" onClick={() => reservationHandler("checkin")}>Check-in</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
                     </div>
                 </div>  
@@ -228,8 +250,8 @@ const Table = (props) => {
                         <div style={{display:"flex"}}>
                             <img src={Avatar} alt="perfil" className="cancelar-left-img"></img>
                             <div className="cancelar-left-user">
-                                <p className="new-id-text-cancelar"></p>
-                                <p className="new-id-text-cancelar">{props.table?istID?istID:props.table.reservation.istID:null}</p>
+                                <p className="new-id-text-cancelar" ></p>
+                                <p className="new-id-text-cancelar">{props.table ? props.table.reservation.istID : null}</p>
                                 <p className="new-id-text-cancelar-duration"><p style={{color:"#ccc", marginRight:"5PX"}}>Tempo restante:</p>{duration?duration:null} min </p>
                                 <p className="new-id-text-cancelar-end"><p style={{color:"#ccc", marginRight:"5PX"}}>Fim:</p>{fim}</p>
                             </div>
@@ -245,11 +267,11 @@ const Table = (props) => {
                 </div>
                 <div className="new-bot">
                     <div className="new-bot-div">
-                        <p className="new-bot-button">Check-out</p>
+                        <p className="new-bot-button" onClick={() => reservationHandler("checkout")}>Check-out</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
-                        <p className="new-bot-button">Estender</p>
+                        <p className="new-bot-button" onClick={() => extendReservation(60*3 /* 60x3 = 3 horas */)} >Estender</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
                     </div>
                 </div>  

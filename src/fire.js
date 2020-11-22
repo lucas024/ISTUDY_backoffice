@@ -17,9 +17,7 @@ var app = firebase.initializeApp({
 const firestore = firebase.firestore()
 
 
-
 export  {
-    firestore, app, functions, admin as default
+    firestore, app as default
   }
-
 

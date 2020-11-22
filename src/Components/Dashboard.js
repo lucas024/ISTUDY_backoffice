@@ -37,7 +37,6 @@ const Dashboard = () => {
                     aux["id"] = doc.id
                     arrayAll.push(aux)
                   })
-                  console.log(arrayAll)
                   updateAllBuildings(arrayAll)
                   for(const building of arrayAll){
                       if(building.name === "rnl"){
@@ -48,7 +47,7 @@ const Dashboard = () => {
                       }
                       
                   }
-                  /* window.setInterval(() => verificaEntradas(arrayAll), 10000); */
+                  window.setInterval(() => verificaEntradas(arrayAll), 10000);
                 })
     }, [])
 
@@ -56,7 +55,6 @@ const Dashboard = () => {
 
     const verificaEntradas = (arrayAll) => {
         let reservation = {
-            duration:null,
             initTime:null,
             endTime:null,
             istID:null,
@@ -66,10 +64,9 @@ const Dashboard = () => {
             for(const room of elem.rooms){
                 for(const table of room.tables){
                     if(table.reservation.endTime){
-                        if(moment(table.reservation.endTime).diff(moment())<0){
+                        if(moment(table.reservation.endTime.toDate()).diff(moment())<0){
                             console.log(table.name)
-                            console.log(room.name)
-                            firestore.collection("tecnico2")
+                            firestore.collection("tecnico4")
                                 .doc(elem.id).get().then(res => {
                             let getRooms = res.data().rooms
                             for(const r of getRooms){
@@ -81,13 +78,10 @@ const Dashboard = () => {
                                             let indexTable = room.tables.findIndex(e =>  {return e.name === t.name})
                                             getTables[indexTable].reservation = reservation
                                             getTables[indexTable].dirty = true
-                                            console.log(getTables)
                                             getRooms[indexRoom] = {
                                                 tables:getTables,
                                                 name:parseInt(room.name) 
                                             }
-                                            console.log(getRooms)
-                                            console.log(room.name)
                                             firestore.collection('tecnico4').doc(elem.id).update({
                                                 rooms: getRooms,
                                                 name: elem.name
@@ -105,10 +99,6 @@ const Dashboard = () => {
     }
    
     
-
-    useEffect(() => {
-        console.log(currentRoomSelected)
-    }, [currentRoomSelected])
 
     const selectBuildingChangeHandler = (val) => {
         for(const elem of allBuildings){
@@ -160,10 +150,6 @@ const Dashboard = () => {
                         else if(mesa.reservation.endTime === null && mesa.dirty===true) livreN++
                         else if(mesa.reservation.endTime !== null && mesa.reservation.checked===false) ocupadaA++
                         else if(mesa.reservation.endTime !== null && mesa.reservation.checked===true) ocupada++
-                        else{
-                            console.log(mesa.reservation.endTime)
-                            console.log(mesa.reservation.checked)
-                        }
                     }  
                     return (
                         <div className="barra-salas-flex2" style={{marginTop:"20px"}}>
@@ -180,15 +166,11 @@ const Dashboard = () => {
     }
 
     const handleTablePress = (val) => {
-        console.log(val)
         updateCurrentTableSelected(val)
     }
 
     const handleReservationConfirm = (table1) => {
         let arrayAll = []
-        console.log(currentBuilding)// objeto edificio
-        console.log(currentRoomSelected)// nome da sala
-        console.log(currentTableSelected)// objeto mesa
         firestore
         .collection('tecnico4')
             .get().then(snapshot => {
@@ -197,16 +179,20 @@ const Dashboard = () => {
                     aux["id"] = doc.id
                     arrayAll.push(aux)
                   })
-                  console.log(arrayAll)
                   updateAllBuildings(arrayAll)
                   for(const b of arrayAll){
                       if(b.name === currentBuilding.name){
                           updateCurrentBuilding(b)
                             for(const r of b.rooms){
                                 if(r.name === currentRoomSelected){
-                                    updateCurrentRoomSelected(r.name)
-                                    updateCurrentTables(r.tables)
-                                    updateCurrentTableSelected(table1)
+                                    for(const table of r.tables){
+                                        if(table.name === table1.name){
+                                            updateCurrentRoomSelected(r.name)
+                                            updateCurrentTables(r.tables)
+                                            updateCurrentTableSelected(table)
+                                        }
+                                    }
+                                    
                                 }
                             }
                                 
