@@ -242,6 +242,41 @@
     border: 2px solid #009DE0;
 }
 
+.new-bot-button-No{
+    color: #000;
+    width: 50px;
+    background-color: #FFF;
+    margin-Top: 5px; 
+    font-Weight: 400;
+    font-Size: 20px;
+    border: 1px solid #CCC;
+    border-radius: 15px;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+.new-bot-button-No:hover{
+    background-color: #CCC;
+    color: #FFF;
+}
+
+.new-bot-button-Yes{
+    background-color: #b30000;
+    width: 50px;
+    color:#FFF;
+    margin-Top: 5px; 
+    font-Weight: 600;
+    font-Size: 20px;
+    border: 1px solid #d00000;
+    border-radius: 15px;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+
+.new-bot-button-Yes:hover{
+    background-color: #a00000;
+}
+
+
 .new-add-time-extend{
     margin: auto;
     top: 70px;

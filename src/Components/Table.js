@@ -6,9 +6,6 @@ import Moment from 'react-moment';
 import moment  from "moment";
 import { firestore } from '../fire';
 
-
-
-
 const Table = (props) => {
 
     const [time, updateTime] = useState(1800)
@@ -18,6 +15,12 @@ const Table = (props) => {
     const [istID, updateIstID] = useState("")
     const [reynaud, updateReynaud] = useState(true)
     let dateExtend = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()):null:null
+    const [checkout, updateCheckout] = useState(false)
+    const [cancel, updateCancel] = useState(true)
+
+    useEffect(() => {
+        updateCancel(true)
+    }, [])
 
     const getMinutes = () => {
         let totalSeconds = time
@@ -50,6 +53,9 @@ const Table = (props) => {
     }
 
     const reservationHandler = (tipo) => {
+
+        updateCancel(true)
+        
         let currentTime = moment()
         let finalTime = moment().add(time, 'seconds')
         let finalTimeMinutes = finalTime.minute()
@@ -160,7 +166,7 @@ const Table = (props) => {
 
     return (
         <div className="table" hidden={props.table?false:true}>
-            <p className="table-bye" onClick={() => { props.callback(); updateReynaud(true);}}>X</p>
+            <p className="table-bye" onClick={() => { props.callback(); updateReynaud(true); updateCancel(true);}}>X</p>
             {/* MESA LIMPA */}
             <div className="new" hidden={props.table?(props.table.reservation.endTime===null && props.table.dirty===false)?false:true:true}>
                 <div className="new-top" >
@@ -254,7 +260,7 @@ const Table = (props) => {
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => reservationHandler("clean")}>Limpa</p>
+                        <p className="new-bot-button" onClick={() => reservationHandler("clean")}>Limpar</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
                     </div>
                 </div>   
@@ -282,14 +288,21 @@ const Table = (props) => {
                 </div>
                 <div className="new-bot">
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => reservationHandler("cancelar")}>Cancelar</p>
+                        <p className="new-bot-button" onClick={() => updateCancel(false)}>Cancelar</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => reservationHandler("clean")}>Limpa</p>
+                        <p className="new-bot-button" onClick={() => reservationHandler("clean")}>Limpar</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
                     </div>
                 </div>  
+                <div className="extend" hidden={cancel}>
+                        <p style={{fontSize: "18px"}}>Tem a certeza que pretende CANCELAR?</p>
+                        <div className="new-add-time-extend" style={{justifyContent: "space-around", marginTop: "10px"}}>
+                            <p className="new-bot-button-No" onClick={() => updateCancel(true)}>NÃO</p>
+                            <p className="new-bot-button-Yes" onClick={() => reservationHandler("cancelar")}>SIM</p>                       
+                        </div> 
+                </div>
                 </div>
             {/* MESA OCUPADA SEM CHECK-IN */}
             <div hidden={props.table?props.table.reservation.endTime !== null && props.table.reservation.checked === false && props.table.dirty===false?false:true:true}>
@@ -314,14 +327,21 @@ const Table = (props) => {
                 </div>
                 <div className="new-bot">
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => reservationHandler("cancelar")}>Cancelar</p>
+                        <p className="new-bot-button" onClick={() => updateCancel(false)}>Cancelar</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
                         <p className="new-bot-button" onClick={() => reservationHandler("checkin")}>Check-in</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
                     </div>
-                </div>  
+                </div>
+                    <div className="extend" hidden={cancel}>
+                        <p style={{fontSize: "18px"}}>Tem a certeza que pretende CANCELAR?</p>
+                        <div className="new-add-time-extend" style={{justifyContent: "space-around", marginTop: "10px"}}>
+                            <p className="new-bot-button-No" onClick={() => updateCancel(true)}>NÃO</p>
+                            <p className="new-bot-button-Yes" onClick={() => reservationHandler("cancelar")}>SIM</p>                       
+                        </div> 
+                    </div>  
                 </div>
             {/* MESA OCUPADA*/}
             <div hidden={props.table?props.table.reservation.endTime !== null && props.table.reservation.checked === true?false:true:true}>
@@ -347,7 +367,7 @@ const Table = (props) => {
                 </div>
                 <div className="new-bot">
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => reservationHandler("checkout")}>Check-out</p>
+                        <p className="new-bot-button" onClick={() => updateCancel(false)}>Check-out</p>
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
@@ -355,6 +375,13 @@ const Table = (props) => {
                         <div className="clean-bot-under-confirmar" style={{backgroundColor: "#DA1919"}}></div>
                     </div>
                 </div> 
+                <div className="extend" hidden={cancel}>
+                        <p style={{fontSize: "18px"}}>Tem a certeza que pretende SAIR?</p>
+                        <div className="new-add-time-extend" style={{justifyContent: "space-around", marginTop: "10px"}}>
+                            <p className="new-bot-button-No" onClick={() => updateCancel(true)}>NÃO</p>
+                            <p className="new-bot-button-Yes" onClick={() => reservationHandler("checkout")}>SIM</p>                       
+                        </div> 
+                </div>  
                 <div className="extend" hidden={reynaud}>
                     <div className="new-add-time-extend">
                         <p className="new-add-duration">Duração:</p>
