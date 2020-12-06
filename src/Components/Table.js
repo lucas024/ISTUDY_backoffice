@@ -17,7 +17,8 @@ const Table = (props) => {
     let fim = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()).hour() + ':' + (moment(props.table.reservation.endTime.toDate()).minute().toString().length<2?"0"+moment(props.table.reservation.endTime.toDate()).minute():moment(props.table.reservation.endTime.toDate()).minute()):null:null
     const [istID, updateIstID] = useState("")
     const [reynaud, updateReynaud] = useState(true)
-
+    let dateExtend = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()):null:null
+    
     const getMinutes = () => {
         let totalSeconds = time
         let hours = Math.floor(totalSeconds / 3600);
@@ -369,11 +370,11 @@ const Table = (props) => {
                             <div style={{marginLeft:"15px"}}>
                                 <div style={{display:"flex"}}>
                                     <p style={{color:"#ccc",marginRight:"5px", textAlign:"right" }}>Início:</p>
-                                    <Moment format="HH:mm">{date}</Moment>
+                                    <Moment format="HH:mm">{dateExtend}</Moment>
                                 </div>
                                 <div style={{display:"flex", justifyContent:"flex-end", marginLeft:"auto", marginRight:0}}>
                                     <p style={{color:"#ccc",marginRight:"5px",textAlign:"right"}}>Fim:</p>
-                                    <Moment format="HH:mm" add={{ seconds: time }} >{date}</Moment>
+                                    <Moment format="HH:mm" add={{ seconds: time }} >{dateExtend}</Moment>
                                 </div>
                             </div>
                         </div>                          
