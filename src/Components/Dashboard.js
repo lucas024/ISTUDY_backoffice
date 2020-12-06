@@ -9,9 +9,9 @@ import app, { firestore, functions, admin } from '../fire.js'
 import moment from 'moment'
 
 const options = [
-    { value: 'rnl', label: 'RNL' },
-    { value: 'civil', label: 'Civil' },
-    { value: 'central', label: 'Central' },
+    { value: 'RNL', label: 'RNL' },
+    { value: 'Civil', label: 'Civil' },
+    { value: 'Central', label: 'Central' },
     { value: 'torrenorte', label: 'Torre Norte' },
     { value: 'torresul', label: 'Torre Sul' }
 ]
@@ -39,7 +39,7 @@ const Dashboard = () => {
                   })
                   updateAllBuildings(arrayAll)
                   for(const building of arrayAll){
-                      if(building.name === "rnl"){
+                      if(building.name === "RNL"){
                         updateCurrentBuilding(building)
                         updateCurrentRoomSelected(building.rooms[0].name)
                         updateCurrentTables(building.rooms[0].tables)

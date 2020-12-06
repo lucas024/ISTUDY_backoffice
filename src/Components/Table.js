@@ -16,6 +16,7 @@ const Table = (props) => {
     let duration = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()).diff(moment(),"minutes"):null:null
     let fim = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()).hour() + ':' + (moment(props.table.reservation.endTime.toDate()).minute().toString().length<2?"0"+moment(props.table.reservation.endTime.toDate()).minute():moment(props.table.reservation.endTime.toDate()).minute()):null:null
     const [istID, updateIstID] = useState("")
+    const [reynaud, updateReynaud] = useState(true)
 
     const getMinutes = () => {
         let totalSeconds = time
@@ -54,24 +55,31 @@ const Table = (props) => {
         let finalTimeMinutes = finalTime.minute()
         if(finalTimeMinutes.length===1) finalTimeMinutes = '0' + finalTimeMinutes
         let f = finalTime.hour() + ':' + finalTimeMinutes
-        fim = f
+        
         duration = finalTime.diff(moment(),"minutes")
         updateIstID(istID)
 
-        if(tipo === 'new')
+        const end = finalTime.toDate()
+        const init = currentTime.toDate()
+
+        if(tipo === 'new'){
             if(!checkIstID()){
                 console.log('The istID inserted does not meet the requirements');
                 console.log('Nothing to do...');
                 return
             }
-        const end = finalTime.toDate()
-        const init = currentTime.toDate()
+            fim = f
+        }
+        else if(tipo === "extend"){
+            var endExtend = moment(fim, 'HH:mm').add(time, "seconds").toDate()
+            updateReynaud(true)
+        }
 
         const reservation = {
-            endTime: end,
+            endTime: tipo === 'extend' ? endExtend : end,
             initTime: init,
-            istID: tipo === 'checkin' ? props.table.reservation.istID : istID,
-            checked: tipo === 'checkin' ? true : false,
+            istID: (tipo === 'checkin' || tipo === 'extend') ? props.table.reservation.istID : istID,
+            checked: (tipo === 'checkin' || tipo === 'extend') ? true : false,
         }
 
         for(const elem of props.buildings){
@@ -86,7 +94,7 @@ const Table = (props) => {
                                 if(t.name === props.table.name){
                                     let getTables = r.tables
                                     let indexTable = r.tables.findIndex(e =>  {return e.name === t.name})
-                                    if(tipo === "new" || tipo === 'checkin'){
+                                    if(tipo === "new" || tipo === 'checkin' || tipo === "extend"){
                                         getTables[indexTable].reservation = reservation
                                         getTables[indexTable].dirty = true
                                         getRooms[indexRoom] = {
@@ -134,18 +142,9 @@ const Table = (props) => {
         }
     }
 
-    function extendReservation(minutes){
-        console.log('I want to extend my reservation');
-        console.log(duration);
-        console.log(moment().hour() + ':' + moment().minute() + ':' + moment().second());
-        var finalTime = moment().add(minutes, 'minutes').format('HH:mm');
-        console.log(finalTime);
-    }
-    
-
     return (
         <div className="table" hidden={props.table?false:true}>
-            <p className="table-bye" onClick={() => props.callback()}>X</p>
+            <p className="table-bye" onClick={() => { props.callback(); updateReynaud(true);}}>X</p>
             {/* MESA LIMPA */}
             <div className="new" hidden={props.table?(props.table.reservation.endTime===null && props.table.dirty===false)?false:true:true}>
                 <div className="new-top" >
@@ -271,10 +270,35 @@ const Table = (props) => {
                         <div className="clean-bot-under-confirmar" style={{backgroundColor:"#FFC700"}}></div>
                     </div>
                     <div className="new-bot-div">
-                        <p className="new-bot-button" onClick={() => extendReservation(60*3 /* 60x3 = 3 horas */)} >Estender</p>
-                        <div className="clean-bot-under-confirmar" style={{backgroundColor:"#DA1919"}}></div>
+                        <p className="new-bot-button" style={{backgroundColor: duration >= 30 ? "#CCCCCC": "#FFFFFF", color: duration >= 30 ? "#FFFFFF": "#009DE0"}} onClick={() => {duration <= 30 ? updateReynaud(false) : console.log("Nada");}} >Estender</p>
+                        <div className="clean-bot-under-confirmar" style={{backgroundColor: "#DA1919"}}></div>
                     </div>
-                </div>  
+                </div> 
+                <div className="extend" hidden={reynaud}>
+                    <div className="new-add-time-extend">
+                        <p className="new-add-duration">Duração:</p>
+                        <div className="new-add-special">
+                            <p onClick={() => timeChangeHandler(0)} className="new-add-button">-</p>
+                            <p className="new-add-time-display">{getMinutes()}</p>
+                            <p onClick={() => timeChangeHandler(1)} className="new-add-button">+</p>
+                        </div>
+                        <div >
+                            <div style={{marginLeft:"15px"}}>
+                                <div style={{display:"flex"}}>
+                                    <p style={{color:"#ccc",marginRight:"5px", textAlign:"right" }}>Início:</p>
+                                    <Moment format="HH:mm">{date}</Moment>
+                                </div>
+                                <div style={{display:"flex", justifyContent:"flex-end", marginLeft:"auto", marginRight:0}}>
+                                    <p style={{color:"#ccc",marginRight:"5px",textAlign:"right"}}>Fim:</p>
+                                    <Moment format="HH:mm" add={{ seconds: time }} >{date}</Moment>
+                                </div>
+                            </div>
+                        </div>                          
+                    </div> 
+                    <div className="new-bot-div-extend-confirmar">
+                            <p className="new-bot-button-confirmar" style={{color:"#FFFFFF", marginTop: "5px", fontWeight: "400", fontSize: "20px"}} onClick={() => reservationHandler("extend")}>Confirmar</p>
+                    </div>  
+                </div>
             </div>
         </div>
     )
