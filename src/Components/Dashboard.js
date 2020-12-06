@@ -18,7 +18,6 @@ const options = [
 
 
 const Dashboard = () => {
-    //const [dt, setDt] = useState(new Date().toLocaleString());
     const [currentBuilding, updateCurrentBuilding] = useState(null); // objeto edificio
     const [currentRoomSelected, updateCurrentRoomSelected] = useState(1); // nome da sala 
     const [currentTables, updateCurrentTables] = useState(); // objeto edificio
@@ -28,7 +27,6 @@ const Dashboard = () => {
     const [allBuildings, updateAllBuildings] = useState(null);
 
     useEffect(() => {
-        console.log("oi")
         let arrayAll = []
         firestore
         .collection('tecnico4')
@@ -42,7 +40,7 @@ const Dashboard = () => {
                   for(const building of arrayAll){
                       if(building.name === "RNL"){
                         updateCurrentBuilding(building)
-                        updateCurrentRoomSelected(building.rooms[0].name)
+                        updateCurrentRoomSelected(parseInt(building.rooms[0].name))
                         updateCurrentTables(building.rooms[0].tables)
                         break
                       }
@@ -66,7 +64,6 @@ const Dashboard = () => {
                 for(const table of room.tables){
                     if(table.reservation.endTime){
                         if(moment(table.reservation.endTime).diff(moment())<0){
-                            console.log(table.name)
                             firestore.collection("tecnico4")
                                 .doc(elem.id).get().then(res => {
                             let getRooms = res.data().rooms
@@ -185,10 +182,10 @@ const Dashboard = () => {
                       if(b.name === currentBuilding.name){
                           updateCurrentBuilding(b)
                             for(const r of b.rooms){
-                                if(r.name === currentRoomSelected){
+                                if(parseInt(r.name) === parseInt(currentRoomSelected)){
                                     for(const table of r.tables){
                                         if(table.name?table.name === table1.name:false){
-                                            updateCurrentRoomSelected(r.name)
+                                            updateCurrentRoomSelected(parseInt(r.name))
                                             updateCurrentTables(r.tables)
                                             updateCurrentTableSelected(table)
                                         }

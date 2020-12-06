@@ -18,7 +18,7 @@ const Table = (props) => {
     const [istID, updateIstID] = useState("")
     const [reynaud, updateReynaud] = useState(true)
     let dateExtend = props.table?props.table.reservation.endTime?moment(props.table.reservation.endTime.toDate()):null:null
-    
+
     const getMinutes = () => {
         let totalSeconds = time
         let hours = Math.floor(totalSeconds / 3600);
@@ -46,7 +46,6 @@ const Table = (props) => {
 
     // Checks if istID meets the requirements
     function checkIstID() {
-        console.log(/^([0-9]{6})$/.test(istID))
         return /^([0-9]{6})$/.test(istID) 
     }
 
@@ -65,8 +64,6 @@ const Table = (props) => {
 
         if(tipo === 'new'){
             if(!checkIstID()){
-                console.log('The istID inserted does not meet the requirements');
-                console.log('Nothing to do...');
                 return
             }
             fim = f
