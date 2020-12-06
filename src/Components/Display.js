@@ -18,7 +18,6 @@ const Display = (props) => {
                             item={item}
                             index={i}
                             current={props.currentTableSelected}
-                            callbackReserva={props.callbackReserva}
                             />
                         </div>
                     )

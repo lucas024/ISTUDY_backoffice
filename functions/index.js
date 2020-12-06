@@ -40,7 +40,7 @@ exports.scheduledFunction2 = functions.pubsub.schedule('every 1 minutes').onRun(
                 getTables[indexTable].reservation = reservation
                 getTables[indexTable].state = 0
                 getRooms[indexRoom].update({
-                    tables:getTables,
+                    tables:getTables
                 })
               
             }

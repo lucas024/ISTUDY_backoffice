@@ -9,9 +9,9 @@ import app, { firestore, functions, admin } from '../fire.js'
 import moment from 'moment'
 
 const options = [
-    { value: 'rnl', label: 'RNL' },
-    { value: 'civil', label: 'Civil' },
-    { value: 'central', label: 'Central' },
+    { value: 'RNL', label: 'RNL' },
+    { value: 'Civil', label: 'Civil' },
+    { value: 'Central', label: 'Central' },
     { value: 'torrenorte', label: 'Torre Norte' },
     { value: 'torresul', label: 'Torre Sul' }
 ]
@@ -28,6 +28,7 @@ const Dashboard = () => {
     const [allBuildings, updateAllBuildings] = useState(null);
 
     useEffect(() => {
+        console.log("oi")
         let arrayAll = []
         firestore
         .collection('tecnico4')
@@ -39,7 +40,7 @@ const Dashboard = () => {
                   })
                   updateAllBuildings(arrayAll)
                   for(const building of arrayAll){
-                      if(building.name === "rnl"){
+                      if(building.name === "RNL"){
                         updateCurrentBuilding(building)
                         updateCurrentRoomSelected(building.rooms[0].name)
                         updateCurrentTables(building.rooms[0].tables)
@@ -47,7 +48,7 @@ const Dashboard = () => {
                       }
                       
                   }
-                  window.setInterval(() => verificaEntradas(arrayAll), 10000);
+                  /* window.setInterval(() => verificaEntradas(arrayAll), 10000); */
                 })
     }, [])
 
@@ -64,7 +65,7 @@ const Dashboard = () => {
             for(const room of elem.rooms){
                 for(const table of room.tables){
                     if(table.reservation.endTime){
-                        if(moment(table.reservation.endTime.toDate()).diff(moment())<0){
+                        if(moment(table.reservation.endTime).diff(moment())<0){
                             console.log(table.name)
                             firestore.collection("tecnico4")
                                 .doc(elem.id).get().then(res => {
@@ -186,7 +187,7 @@ const Dashboard = () => {
                             for(const r of b.rooms){
                                 if(r.name === currentRoomSelected){
                                     for(const table of r.tables){
-                                        if(table.name === table1.name){
+                                        if(table.name?table.name === table1.name:false){
                                             updateCurrentRoomSelected(r.name)
                                             updateCurrentTables(r.tables)
                                             updateCurrentTableSelected(table)
@@ -282,8 +283,7 @@ const Dashboard = () => {
                     <div style={{marginTop:"40px"}}>
                         <Display
                             tables={currentTables}
-                            callback={(e) => handleTablePress(e)}
-                            currentTableSelected={currentTableSelected}/>
+                            callback={(e) => handleTablePress(e)}/>
                     </div>
                     
 
