@@ -148,6 +148,7 @@ const Table = (props) => {
                                         name: elem.name
                                     }).then(() => {
                                         props.callbackReserva(t)
+                                        updateIstID("")
                                  })
                                 }
                             }
@@ -160,14 +161,14 @@ const Table = (props) => {
 
     return (
         <div className="table" hidden={props.table?false:true}>
-            <p className="table-bye" onClick={() => { props.callback(); updateReynaud(true);}}>X</p>
+            <p className="table-bye" onClick={() => { props.callback(); updateReynaud(true); updateIstID("")}}>X</p>
             {/* MESA LIMPA */}
             <div className="new" hidden={props.table?(props.table.reservation.endTime===null && props.table.dirty===false)?false:true:true}>
                 <div className="new-top" >
                     <div className="new-left">
                         <div className="new-id">
                             <p className="new-id-text">IST ID</p>
-                            <input className={istID ? checkIstID() ? "new-id-input" : "new-id-input-2" : "new-id-input"} onChange={(e) => updateIstID(e.target.value)}></input>
+                            <input className={istID ? checkIstID() ? "new-id-input" : "new-id-input-2" : "new-id-input"} value={istID} onChange={(e) => updateIstID(e.target.value)}></input>
                         </div>
                         <div className="new-add-time">
                             <p className="new-add-duration">Duração:</p>
